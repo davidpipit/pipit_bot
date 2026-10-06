@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pipit Bot - AI Assistant</title>
+    <style>
+        :root {
+            --primary: #0f172a;
+            --secondary: #3b82f6;
+            --bg-body: #f8fafc;
+            --bg-card: #ffffff;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background-color: var(--bg-body); color: var(--text-main); line-height: 1.6; }
+        .container { max-width: 1000px; margin: 0 auto; padding: 2rem 1.5rem; }
+        
+        /* Hero Section */
+        .hero { text-align: center; padding: 4rem 0 3rem; }
+        .avatar { font-size: 4rem; background: var(--bg-card); width: 100px; height: 100px; display: inline-flex; align-items: center; justify-content: center; border-radius: 50%; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); margin-bottom: 1rem; }
+        .badge { display: inline-block; background: #ecfdf5; color: #059669; padding: 0.5rem 1rem; border-radius: 999px; font-size: 0.875rem; font-weight: 600; margin-bottom: 1.5rem; border: 1px solid #a7f3d0; }
+        .hero h1 { font-size: 2.5rem; color: var(--primary); margin-bottom: 1rem; }
+        .hero p { font-size: 1.125rem; color: var(--text-muted); max-width: 600px; margin: 0 auto; }
+
+        /* Problem & Solution Card */
+        .comparison-grid { display: grid; grid-template-columns: 1fr; gap: 1.5rem; margin-bottom: 4rem; }
+        @media(min-width: 768px) { .comparison-grid { grid-template-columns: 1fr 1fr; } }
+        .card { background: var(--bg-card); padding: 2rem; border-radius: 12px; border: 1px solid var(--border); box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        .card h3 { font-size: 1.25rem; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem; }
+        .chaos h3 { color: #dc2626; }
+        .solution h3 { color: #059669; }
+        .card ul { list-style: none; }
+        .card ul li { margin-bottom: 0.75rem; padding-left: 1.5rem; position: relative; color: var(--text-muted); }
+        .chaos ul li::before { content: "✕"; position: absolute; left: 0; color: #dc2626; }
+        .solution ul li::before { content: "✓"; position: absolute; left: 0; color: #059669; }
+
+        /* Core Capabilities */
+        .section-title { text-align: center; font-size: 1.75rem; margin-bottom: 2rem; color: var(--primary); }
+        .features-grid { display: grid; grid-template-columns: 1fr; gap: 1.5rem; margin-bottom: 4rem; }
+        @media(min-width: 768px) { .features-grid { grid-template-columns: repeat(3, 1fr); } }
+        .feature-card { background: var(--bg-card); padding: 1.5rem; border-radius: 12px; border: 1px solid var(--border); text-align: center; transition: transform 0.2s; }
+        .feature-card:hover { transform: translateY(-5px); }
+        .feature-icon { font-size: 2.5rem; margin-bottom: 1rem; }
+        .feature-card h4 { font-size: 1.125rem; margin-bottom: 0.5rem; color: var(--primary); }
+        .feature-card p { font-size: 0.875rem; color: var(--text-muted); }
+
+        /* Interactive Simulation */
+        .simulation-wrapper { max-width: 700px; margin: 0 auto 4rem; background: var(--bg-card); border-radius: 12px; border: 1px solid var(--border); overflow: hidden; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); }
+        .chat-header { background: #f1f5f9; padding: 1rem; border-bottom: 1px solid var(--border); font-weight: 600; display: flex; align-items: center; gap: 0.5rem; }
+        .chat-box { height: 300px; padding: 1.5rem; overflow-y: auto; display: flex; flex-direction: column; gap: 1rem; background: #fafafa; }
+        .msg { max-width: 80%; padding: 0.75rem 1rem; border-radius: 12px; font-size: 0.9rem; animation: fadeIn 0.3s ease-in; }
+        .msg.bot { background: #f1f5f9; color: var(--text-main); align-self: flex-start; border-bottom-left-radius: 2px; }
+        .msg.user { background: var(--secondary); color: white; align-self: flex-end; border-bottom-right-radius: 2px; }
+        .typing { display: none; align-self: flex-start; background: #f1f5f9; padding: 0.5rem 1rem; border-radius: 12px; font-size: 0.8rem; color: var(--text-muted); margin-bottom: 1rem; }
+        .chat-controls { padding: 1rem; background: white; border-top: 1px solid var(--border); display: flex; flex-direction: column; gap: 0.5rem; }
+        .chat-btn { background: var(--bg-body); border: 1px solid var(--border); padding: 0.75rem; border-radius: 6px; cursor: pointer; text-align: left; font-size: 0.875rem; color: var(--text-main); transition: all 0.2s; }
+        .chat-btn:hover { background: #e2e8f0; }
+        
+        /* Footer & CTA */
+        .footer { text-align: center; padding: 3rem 0; border-top: 1px solid var(--border); }
+        .cta-button { display: inline-block; background: var(--secondary); color: white; padding: 1rem 2rem; border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 1.125rem; margin-bottom: 1.5rem; transition: background 0.2s; }
+        .cta-button:hover { background: #2563eb; }
+        .footer-text { font-size: 0.875rem; color: var(--text-muted); }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body>
+    <div class="container">
+        
+        <!-- 1. HERO SECTION -->
+        <section class="hero">
+            <div class="avatar">🐤</div>
+            <div class="badge">🟢 Status: Active & Ready 24/7</div>
+            <h1>Pipit Bot</h1>
+            <p>Asisten cerdas untuk merangkum notulensi rapat, mengingatkan tugas harian/mingguan, dan merapikan file kerja Anda.</p>
+        </section>
+
+        <!-- 2. PROBLEM & SOLUTION CARD -->
+        <section class="comparison-grid">
+            <div class="card chaos">
+                <h3>⚠️ The Chaos</h3>
+                <ul>
+                    <li>Sering lupa mengerjakan tugas dan kewajiban harian/mingguan.</li>
+                    <li>Tidak punya waktu untuk membuat notulensi atau ringkasan rapat.</li>
+                    <li>File dan dokumen pekerjaan menumpuk berantakan dan sulit dicari.</li>
+                </ul>
+            </div>
+            <div class="card solution">
+                <h3>✨ The Solution</h3>
+                <ul>
+                    <li>Pengingat tugas otomatis yang dikirim langsung via Email.</li>
+                    <li>Integrasi dengan Google Meet untuk rekam dan rangkum rapat instan.</li>
+                    <li>Mengorganisasi file secara otomatis dengan sistem Approval (Human-in-the-Loop).</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- 3. CORE CAPABILITIES -->
+        <h2 class="section-title">Core Capabilities</h2>
+        <section class="features-grid">
+            <div class="feature-card">
+                <div class="feature-icon">📹</div>
+                <h4>Meet Notetaker</h4>
+                <p>Terhubung langsung ke Google Meet untuk merekam diskusi dan menyusun notulensi rapat secara otomatis.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">📁</div>
+                <h4>Smart File Organizer</h4>
+                <p>Merapikan dokumen Anda ke folder yang tepat. Selalu meminta persetujuan Anda sebelum memindahkan file.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">📧</div>
+                <h4>Task Reminder</h4>
+                <p>Mengelola jadwal Anda dan mengirimkan pengingat tugas harian atau mingguan tepat waktu via Email.</p>
+            </div>
+        </section>
+
+        <!-- 4. INTERACTIVE SIMULATION -->
+        <h2 class="section-title">Live Simulation</h2>
+        <section class="simulation-wrapper">
+            <div class="chat-header">
+                <span>🐤</span> Pipit Bot
+            </div>
+            <div class="chat-box" id="chat-box">
+                <div class="msg bot">Halo! Saya Pipit. Ada yang bisa saya bantu untuk pekerjaan hari ini?</div>
+                <div class="typing" id="typing-indicator">Pipit sedang mengetik...</div>
+            </div>
+            <div class="chat-controls">
+                <button class="chat-btn" onclick="triggerChat(1)">"Buatkan ringkasan dari meeting dengan Klien tadi pagi."</button>
+                <button class="chat-btn" onclick="triggerChat(2)">"Tolong ingatkan saya untuk kirim report mingguan jam 4 sore."</button>
+                <button class="chat-btn" onclick="triggerChat(3)">"Tolong rapikan file di folder download saya."</button>
+            </div>
+        </section>
+
+        <!-- 5. FOOTER & CTA -->
+        <footer class="footer">
+            <a href="https://wa.me/628161974260" class="cta-button" target="_blank">Hubungi via WhatsApp</a>
+            <p class="footer-text">Built with AI · AI Builder Bootcamp Showcase</p>
+        </footer>
+
+    </div>
+
+    <script>
+        const chatBox = document.getElementById('chat-box');
+        const typing = document.getElementById('typing-indicator');
+
+        const scenarios = {
+            1: "Notulensi rapat 'Meeting Klien' sudah siap! Poin penting: Klien menyetujui timeline proyek baru. Draft lengkap sudah saya simpan di Google Drive Anda.",
+            2: "Siap! Reminder untuk 'Kirim Report Mingguan' pada pukul 16:00 WIB telah berhasil dijadwalkan dan akan dikirimkan via Email.",
+            3: "Saya mendeteksi 12 file PDF dan 5 gambar tidak teratur. Bolehkah saya memindahkannya ke folder 'Report 2026'? (Ketik 'Ya' untuk setuju)."
+        };
+
+        const buttons = {
+            1: "Buatkan ringkasan dari meeting dengan Klien tadi pagi.",
+            2: "Tolong ingatkan saya untuk kirim report mingguan jam 4 sore.",
+            3: "Tolong rapikan file di folder download saya."
+        };
+
+        function triggerChat(scenarioId) {
+            // Append User message
+            const userMsg = document.createElement('div');
+            userMsg.className = 'msg user';
+            userMsg.textContent = buttons[scenarioId];
+            chatBox.insertBefore(userMsg, typing);
+            chatBox.scrollTop = chatBox.scrollHeight;
+
+            // Show typing indicator
+            typing.style.display = 'block';
+            chatBox.scrollTop = chatBox.scrollHeight;
+
+            // Disable buttons temporarily
+            const btns = document.querySelectorAll('.chat-btn');
+            btns.forEach(btn => btn.disabled = true);
+
+            // Simulate delay
+            setTimeout(() => {
+                typing.style.display = 'none';
+                
+                const botMsg = document.createElement('div');
+                botMsg.className = 'msg bot';
+                botMsg.textContent = scenarios[scenarioId];
+                chatBox.insertBefore(botMsg, typing);
+                chatBox.scrollTop = chatBox.scrollHeight;
+
+                btns.forEach(btn => btn.disabled = false);
+            }, 1500);
+        }
+    </script>
+</body>
+</html>
